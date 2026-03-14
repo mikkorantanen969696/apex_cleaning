@@ -1,3 +1,15 @@
 venv 
 .env
 __pycache__
+.pytest_cache
+.ruff_cache
+.mypy_cache
+*.db
+*.sqlite
+*.sqlite3
+*.log
+dist
+build
+*.egg-info
+.idea
+.vscode
