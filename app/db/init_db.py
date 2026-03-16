@@ -22,9 +22,14 @@ async def _ensure_order_columns() -> None:
             await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS cleaning_type VARCHAR(64) NOT NULL DEFAULT ''"))
             await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS area_sqm NUMERIC(10, 2)"))
             await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS rooms_count INTEGER"))
+            await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS bathrooms_count INTEGER"))
             await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS detergents_on_site BOOLEAN NOT NULL DEFAULT TRUE"))
+            await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS vacuum_on_site BOOLEAN"))
+            await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS ladder_on_site BOOLEAN"))
             await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS equipment_required TEXT NOT NULL DEFAULT ''"))
             await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS work_scope TEXT NOT NULL DEFAULT ''"))
+            await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS access_notes TEXT NOT NULL DEFAULT ''"))
+            await conn.execute(text("ALTER TABLE orders ADD COLUMN IF NOT EXISTS client_contact_method VARCHAR(32) NOT NULL DEFAULT ''"))
             return
 
         if dialect == "sqlite":
@@ -38,12 +43,22 @@ async def _ensure_order_columns() -> None:
                 await conn.execute(text("ALTER TABLE orders ADD COLUMN area_sqm NUMERIC(10, 2)"))
             if "rooms_count" not in existing:
                 await conn.execute(text("ALTER TABLE orders ADD COLUMN rooms_count INTEGER"))
+            if "bathrooms_count" not in existing:
+                await conn.execute(text("ALTER TABLE orders ADD COLUMN bathrooms_count INTEGER"))
             if "detergents_on_site" not in existing:
                 await conn.execute(text("ALTER TABLE orders ADD COLUMN detergents_on_site BOOLEAN NOT NULL DEFAULT 1"))
+            if "vacuum_on_site" not in existing:
+                await conn.execute(text("ALTER TABLE orders ADD COLUMN vacuum_on_site BOOLEAN"))
+            if "ladder_on_site" not in existing:
+                await conn.execute(text("ALTER TABLE orders ADD COLUMN ladder_on_site BOOLEAN"))
             if "equipment_required" not in existing:
                 await conn.execute(text("ALTER TABLE orders ADD COLUMN equipment_required TEXT NOT NULL DEFAULT ''"))
             if "work_scope" not in existing:
                 await conn.execute(text("ALTER TABLE orders ADD COLUMN work_scope TEXT NOT NULL DEFAULT ''"))
+            if "access_notes" not in existing:
+                await conn.execute(text("ALTER TABLE orders ADD COLUMN access_notes TEXT NOT NULL DEFAULT ''"))
+            if "client_contact_method" not in existing:
+                await conn.execute(text("ALTER TABLE orders ADD COLUMN client_contact_method VARCHAR(32) NOT NULL DEFAULT ''"))
 
 
 async def init_db() -> None:

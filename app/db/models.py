@@ -101,13 +101,18 @@ class Order(Base):
 
     client_name: Mapped[str] = mapped_column(String(64), default="", server_default="")
     client_phone: Mapped[str] = mapped_column(String(32), default="", server_default="")
+    client_contact_method: Mapped[str] = mapped_column(String(32), default="", server_default="")
 
     area_sqm: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
     rooms_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    bathrooms_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     detergents_on_site: Mapped[bool] = mapped_column(Boolean, default=True, server_default="1")
+    vacuum_on_site: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
+    ladder_on_site: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     equipment_required: Mapped[str] = mapped_column(Text, default="", server_default="")
     work_scope: Mapped[str] = mapped_column(Text, default="", server_default="")
+    access_notes: Mapped[str] = mapped_column(Text, default="", server_default="")
 
     price_client: Mapped[Optional[float]] = mapped_column(Numeric(12, 2), nullable=True)
     comment: Mapped[str] = mapped_column(Text, default="", server_default="")
