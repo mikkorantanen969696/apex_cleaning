@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from sqlalchemy import and_, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.db.models import City, Order, OrderStatus, User, UserRole
 
@@ -81,6 +82,20 @@ async def get_order(session: AsyncSession, order_id: int) -> Order | None:
     return await session.scalar(select(Order).where(Order.id == order_id))
 
 
+async def get_order_full(session: AsyncSession, order_id: int) -> Order | None:
+    stmt = (
+        select(Order)
+        .where(Order.id == order_id)
+        .options(selectinload(Order.city), selectinload(Order.manager), selectinload(Order.cleaner), selectinload(Order.photos))
+    )
+    return await session.scalar(stmt)
+
+
+async def list_recent_orders(session: AsyncSession, limit: int = 20) -> list[Order]:
+    stmt = select(Order).order_by(Order.id.desc()).limit(limit).options(selectinload(Order.city))
+    return (await session.scalars(stmt)).all()
+
+
 async def list_manager_orders(session: AsyncSession, manager_user_id: int, limit: int = 20) -> list[Order]:
     return (
         (await session.scalars(select(Order).where(Order.manager_id == manager_user_id).order_by(Order.id.desc()).limit(limit)))
@@ -97,7 +112,14 @@ async def list_cleaner_orders(session: AsyncSession, cleaner_user_id: int, limit
 
 async def list_available_orders(session: AsyncSession, limit: int = 20) -> list[Order]:
     return (
-        (await session.scalars(select(Order).where(Order.status == OrderStatus.published).order_by(Order.id.desc()).limit(limit)))
+        (
+            await session.scalars(
+                select(Order)
+                .where(Order.status == OrderStatus.published, Order.cleaner_id.is_(None))
+                .order_by(Order.id.desc())
+                .limit(limit)
+            )
+        )
         .all()
     )
 
@@ -110,4 +132,3 @@ def safe_decimal(value: str) -> Decimal | None:
         return Decimal(value)
     except Exception:
         return None
-

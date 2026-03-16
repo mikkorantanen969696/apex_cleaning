@@ -68,7 +68,8 @@ def photo_kind_kb(order_id: int) -> InlineKeyboardMarkup:
 
 def order_actions_kb(order_id: int, is_manager: bool, is_cleaner: bool) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
-    kb.button(text="📷 Загрузить фото", callback_data=f"photo:start:{order_id}")
+    if is_cleaner:
+        kb.button(text="📷 Загрузить фото", callback_data=f"photo:start:{order_id}")
     if is_manager:
         kb.button(text="💰 Отметить оплату клиента", callback_data=f"pay:client:{order_id}")
         kb.button(text="📄 Счет (PDF+QR)", callback_data=f"invoice:order:{order_id}")
@@ -78,4 +79,3 @@ def order_actions_kb(order_id: int, is_manager: bool, is_cleaner: bool) -> Inlin
     kb.button(text="⬅️ В меню", callback_data="menu")
     kb.adjust(1, 1, 1)
     return kb.as_markup()
-

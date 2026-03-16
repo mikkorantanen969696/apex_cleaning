@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -28,6 +29,35 @@ class Settings(BaseSettings):
     payment_purpose_template: str = "Оплата услуг по заявке {order_public_id}"
 
     send_admin_notifications: int = 1
+
+    @staticmethod
+    def _strip_env_assignment(value: str, key: str) -> str:
+        value = value.strip().strip('"').strip("'").strip()
+        prefix = f"{key}="
+        if value.upper().startswith(prefix.upper()):
+            return value.split("=", 1)[1].strip().strip('"').strip("'").strip()
+        return value
+
+    @field_validator("bot_token", mode="before")
+    @classmethod
+    def _normalize_bot_token(cls, v):
+        if isinstance(v, str):
+            return cls._strip_env_assignment(v, "BOT_TOKEN")
+        return v
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _normalize_database_url(cls, v):
+        if isinstance(v, str):
+            return cls._strip_env_assignment(v, "DATABASE_URL")
+        return v
+
+    @field_validator("sqlite_path", mode="before")
+    @classmethod
+    def _normalize_sqlite_path(cls, v):
+        if isinstance(v, str):
+            return cls._strip_env_assignment(v, "SQLITE_PATH")
+        return v
 
     def admin_ids(self) -> List[int]:
         if not self.admin_telegram_ids.strip():
@@ -61,4 +91,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
